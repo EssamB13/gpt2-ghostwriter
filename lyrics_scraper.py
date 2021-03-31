@@ -6,9 +6,7 @@ import csv
 import pandas as pd
 from requests.exceptions import Timeout
 
-os.chdir(os.path.dirname(os.path.abspath(__file__)))
-print (os.getcwd())
-file = open("lyrics_TEST.txt", "a", encoding='utf-8-sig')  # File to write lyrics to
+
 genius = lg.Genius('9eaSCQyRFX_uPmVcRmDRqjvs96eX-sN-41ucB5h81RQDGBVl000JfDsnPgutY6x7',  # Client access token from Genius Client API page
                              skip_non_songs=True, excluded_terms=["(Remix)", "(Live)"],
                              remove_section_headers=True)
@@ -16,11 +14,11 @@ genius.timeout = 15
 
 
 artists = [
-        "Eminem", "Kendrick Lamar", "Big Shaq", "Cardi B", "Travis Scott", "Logic",
+        "Eminem", "Kendrick Lamar", "Big Shaq", "Cardi B", "Travis Scott", "Logic", "Freddie Gibbs"
         "Kanye West", "Lil Uzi Vert", "Fetty Wap", "Post Malone", "JAY-Z", "Lil Wayne", "Snoop Dogg",
         "2Pac", "J. Cole", "50 Cent", "T.I.", "Dr. Dre", "Migos", "Future", "OutKast",
         "Busta Rhymes","A$AP Rocky", "A$AP Ferg", "Ice Cube", "Rick Ross", "2 Chainz", "Wu-Tang Clan", "Juice Wrld", "Young Thug",
-        "Big Sean", "Ghostface Killah", "Donald Glover", "Jeezy", "DMX", "Chance the Rapper", "Rakim",
+        "Big Sean", "Ghostface Killah", "Jeezy", "DMX", "Chance the Rapper", "Rakim",
         "LL Cool J", "Wiz Khalifa", "Chris Brown", "N.W.A", "Scarface", "XXXTENTACION", "The Notorious B.I.G.", "Nas",
         "André 3000", "Childish Gambino", "Nate Dogg", "Joyner Lucas", "The Game",
         "Ludacris", "Kid Cudi", "Redman", "Lauryn Hill", "Nicki Minaj", "KRS-One", "Big Pun", "Pusha T", "Hopsin", 
@@ -41,6 +39,11 @@ artists = [
 print (len(artists))
 
 def get_lyrics(arr, k):  # Write lyrics of k songs by each artist in arr
+    
+    os.chdir(os.path.dirname(os.path.abspath(__file__)))
+    print (os.getcwd())
+    file = open("lyrics_TEST.txt", "w", encoding='utf-8-sig')  # File to write lyrics to
+
     c = 0 # Counter
     for name in arr:
         retries = 0 
@@ -55,7 +58,6 @@ def get_lyrics(arr, k):  # Write lyrics of k songs by each artist in arr
             if artist_obj is not None:
                 for i in range(artist_obj.num_songs):
                     song = artist_obj.songs[i]
-
                     if song.lyrics is not None:
                         file.write('\n'+ song.lyrics + "\n<delim>")
                         print("song saved: ", song.title)
@@ -65,11 +67,18 @@ def get_lyrics(arr, k):  # Write lyrics of k songs by each artist in arr
             
             break 
     print ("Songs gathered: ", c)
+    file.close()
 #get_lyrics(artists, 35)
-file.close()
 
-with open("lyrics_5k.txt", "r", encoding='utf-8-sig', newline='') as file:
-    contents = file.read()
-    df = pd.DataFrame(contents.split('<delim>'),columns=['lyrics_col'])
 
-print (df)
+def retrieve_lyrics(): 
+    with open("lyrics_5k.txt", "r", encoding='utf-8-sig', newline='') as file:
+        contents = file.read()
+        df = pd.DataFrame(contents.split('<delim>'),columns=['lyrics_col'])
+    
+    return df
+
+data = retrieve_lyrics() 
+
+print(data.isnull().values.any())
+print(data)
