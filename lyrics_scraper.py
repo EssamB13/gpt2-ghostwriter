@@ -4,14 +4,17 @@ import lyricsgenius as lg # https://github.com/johnwmillr/LyricsGenius
 import os 
 import csv
 import pandas as pd
+import sys
 from requests.exceptions import Timeout
 
 
 genius = lg.Genius('9eaSCQyRFX_uPmVcRmDRqjvs96eX-sN-41ucB5h81RQDGBVl000JfDsnPgutY6x7',  # Client access token from Genius Client API page
                              skip_non_songs=True, excluded_terms=["(Remix)", "(Live)"],
-                             remove_section_headers=True)
+                             remove_section_headers=False)
+
 genius.timeout = 15
 
+# artists = ["Lil Ugly Mane", "Kendrick Lamar", "Freddie Gibbs"]
 
 artists = [
         "Eminem", "Kendrick Lamar", "Big Shaq", "Cardi B", "Travis Scott", "Logic", "Freddie Gibbs"
@@ -42,33 +45,43 @@ def get_lyrics(arr, k):  # Write lyrics of k songs by each artist in arr
     
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
     print (os.getcwd())
-    file = open("lyrics_TEST.txt", "w", encoding='utf-8-sig')  # File to write lyrics to
+    lyrics_file = open("lyrics_5kheaders.txt", "w", encoding='utf-8-sig')  # File to write lyrics to
+      
+    log_file = open("log.txt", "w", encoding="utf-8")
 
     c = 0 # Counter
     for name in arr:
         retries = 0 
         while retries < 3:
             try:
-                print ("trying")
+                print ("trying ", name)
                 artist_obj = genius.search_artist(name, max_songs=k, sort='popularity')
             except Timeout as e:
                 retries += 1
                 print ("RETRYING: ", name)
                 continue
             if artist_obj is not None:
+                log_file.write(name + "\n")
                 for i in range(artist_obj.num_songs):
                     song = artist_obj.songs[i]
                     if song.lyrics is not None:
-                        file.write('\n'+ song.lyrics + "\n<delim>")
+                        lyrics_file.write("<< {} - {} >> \n".format(name, song.title))
+                        lyrics_file.write('\n'+ song.lyrics + "\n<delim>\n")
+                        log_file.write("song saved: " + song.title + "\n")
                         print("song saved: ", song.title)
                         c += 1 
                     else:
+                        log_file.write("SONG BROKEN: " + song.title + "\n")
                         print("SONG BROKEN: ", song.title)
             
             break 
     print ("Songs gathered: ", c)
-    file.close()
-#get_lyrics(artists, 35)
+    log_file.write("Songs gathered: " + str(c))
+    log_file.close()
+    lyrics_file.close()
+
+
+get_lyrics(artists, 40)
 
 
 def retrieve_lyrics(): 
@@ -78,7 +91,5 @@ def retrieve_lyrics():
     
     return df
 
-data = retrieve_lyrics() 
 
-print(data.isnull().values.any())
-print(data)
+
