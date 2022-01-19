@@ -1,7 +1,9 @@
 # gpt2-ghostwriter
 GPT2 fined tuned on a large hip hop lyrics database to generate novel hip hop lyrics 
 
-See the presentation slides to get an overview of the entire project, including my motivations and outcomes. The final report is titled "Computational Lyrics Generation and Transformers" and can also be found in this repo. 
+See the presentation slides to get an overview of the entire project, including my motivations and outcomes. 
+
+The final submitted academic paper is titled "Computational Lyrics Generation and Transformers" and can also be found in this repo. 
 
 train_eval_notebook.ipynb is the notebook that goes through a more "modern" training processing using Trainer and Datasets from HuggingFace
 
